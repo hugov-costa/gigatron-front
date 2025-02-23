@@ -1,8 +1,13 @@
 "use client";
+import { Delete, Edit } from "@mui/icons-material";
 import {
   Box,
+  Button,
   Divider,
+  IconButton,
+  Modal,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -40,7 +45,16 @@ const tableHeaders = [
 ];
 
 const UsersIndex = () => {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+
+  const handleOpen = (id: number) => {
+    setUserId(id);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
 
   const fetchUsers = async () => {
     const response = await fetch(`/api/users`);
@@ -48,7 +62,23 @@ const UsersIndex = () => {
     setUsers(result.data);
   };
 
-  const filteredUsers = users.map(({ name, email, phone }) => ({
+  const handleDelete = async () => {
+    if (userId === null) return;
+
+    setLoading(true);
+
+    await fetch(`/api/users/${userId}`, {
+      method: "DELETE",
+    });
+
+    setUsers(users.filter((user) => user.id !== userId));
+    handleClose();
+
+    setLoading(false);
+  };
+
+  const filteredUsers = users.map(({ id, name, email, phone }) => ({
+    id,
     name,
     email,
     phone,
@@ -59,10 +89,22 @@ const UsersIndex = () => {
   }, []);
 
   return (
-    <Box sx={{ px: 6, py: 4 }}>
-      <Typography variant="h3" gutterBottom>
-        Listagem de usuários
-      </Typography>
+    <Box sx={{ px: 10, py: 4 }}>
+      <Stack direction="row" justifyContent={"space-between"}>
+        <Typography variant="h3" gutterBottom>
+          Listagem de usuários
+        </Typography>
+
+        <Box>
+          <Button
+            variant="contained"
+            href="http://localhost:3000/users/create"
+            sx={{ mt: 1, mr: 3 }}
+          >
+            Novo usuário
+          </Button>
+        </Box>
+      </Stack>
 
       <Divider variant="middle" sx={{ mb: 3 }} />
 
@@ -75,7 +117,7 @@ const UsersIndex = () => {
                   <TableCell
                     key={header.key}
                     align="left"
-                    style={{ minWidth: 170, fontWeight: "bold" }}
+                    style={{ minWidth: 100, fontWeight: "bold" }}
                   >
                     {header.label}
                   </TableCell>
@@ -86,13 +128,89 @@ const UsersIndex = () => {
             <TableBody>
               {filteredUsers.map((user, index) => (
                 <TableRow
-                  key={users[index].id}
+                  key={user.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell align="left">{user.name}</TableCell>
                   <TableCell align="left">{user.email}</TableCell>
                   <TableCell align="left">{user.phone}</TableCell>
-                  <TableCell align="left">ação</TableCell>
+                  <TableCell align="left">
+                    <IconButton
+                      aria-label="edit"
+                      color="primary"
+                      href={`http://localhost:3000/users/edit/${user.id}`}
+                      disabled={loading}
+                    >
+                      <Edit />
+                    </IconButton>
+
+                    <IconButton
+                      aria-label="edit"
+                      color="error"
+                      onClick={() => handleOpen(user.id)}
+                      disabled={loading}
+                    >
+                      <Delete />
+                    </IconButton>
+
+                    <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                      sx={{
+                        "& .MuiBackdrop-root": {
+                          backgroundColor: "rgba(0, 0, 0, 0.03)",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: 400,
+                          bgcolor: "background.paper",
+                          border: "2px solid #000",
+                          p: 4,
+                        }}
+                      >
+                        <Typography
+                          id="modal-modal-title"
+                          variant="h6"
+                          component="h2"
+                        >
+                          Exclusão de usuário
+                        </Typography>
+
+                        <Typography
+                          id="modal-modal-description"
+                          sx={{ mt: 2, textJustify: "justified" }}
+                        >
+                          Tem certeza de que deseja excluir esse usuário?
+                        </Typography>
+
+                        <Stack direction="row" spacing={5} sx={{ mt: 3 }}>
+                          <Button
+                            variant="contained"
+                            onClick={handleDelete}
+                            disabled={loading}
+                          >
+                            Sim
+                          </Button>
+
+                          <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleClose}
+                          >
+                            Não
+                          </Button>
+                        </Stack>
+                      </Box>
+                    </Modal>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
