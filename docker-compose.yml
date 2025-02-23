@@ -1,0 +1,15 @@
+services:
+  next:
+    image: node:23-alpine
+    working_dir: /app
+    command: sh -c "npm run dev"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - gigatron-api_slim-network
+
+networks:
+  gigatron-api_slim-network:
+    external: true
