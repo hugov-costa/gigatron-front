@@ -135,7 +135,7 @@ const UsersIndex = () => {
                   <TableCell align="left">{user.email}</TableCell>
                   <TableCell align="left">{user.phone}</TableCell>
                   <TableCell align="left">
-                  <IconButton
+                    <IconButton
                       aria-label="edit"
                       color="primary"
                       href={`http://localhost:3000/users/view/${user.id}`}
