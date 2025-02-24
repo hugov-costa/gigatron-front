@@ -138,15 +138,6 @@ const UsersIndex = () => {
                     <IconButton
                       aria-label="edit"
                       color="primary"
-                      href={`http://localhost:3000/users/view/${user.id}`}
-                      disabled={loading}
-                    >
-                      <Visibility />
-                    </IconButton>
-
-                    <IconButton
-                      aria-label="edit"
-                      color="primary"
                       href={`http://localhost:3000/users/edit/${user.id}`}
                       disabled={loading}
                     >
