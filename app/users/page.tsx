@@ -1,11 +1,11 @@
 "use client";
-import { Delete, Edit } from "@mui/icons-material";
+import DeleteModal from "@/components/common/DeleteModal";
+import { Delete, Edit, Visibility } from "@mui/icons-material";
 import {
   Box,
   Button,
   Divider,
   IconButton,
-  Modal,
   Paper,
   Stack,
   Table,
@@ -126,7 +126,7 @@ const UsersIndex = () => {
             </TableHead>
 
             <TableBody>
-              {filteredUsers.map((user, index) => (
+              {filteredUsers.map((user) => (
                 <TableRow
                   key={user.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -135,6 +135,15 @@ const UsersIndex = () => {
                   <TableCell align="left">{user.email}</TableCell>
                   <TableCell align="left">{user.phone}</TableCell>
                   <TableCell align="left">
+                  <IconButton
+                      aria-label="edit"
+                      color="primary"
+                      href={`http://localhost:3000/users/view/${user.id}`}
+                      disabled={loading}
+                    >
+                      <Visibility />
+                    </IconButton>
+
                     <IconButton
                       aria-label="edit"
                       color="primary"
@@ -153,63 +162,12 @@ const UsersIndex = () => {
                       <Delete />
                     </IconButton>
 
-                    <Modal
+                    <DeleteModal
                       open={open}
-                      onClose={handleClose}
-                      aria-labelledby="modal-modal-title"
-                      aria-describedby="modal-modal-description"
-                      sx={{
-                        "& .MuiBackdrop-root": {
-                          backgroundColor: "rgba(0, 0, 0, 0.03)",
-                        },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                          width: 400,
-                          bgcolor: "background.paper",
-                          border: "2px solid #000",
-                          p: 4,
-                        }}
-                      >
-                        <Typography
-                          id="modal-modal-title"
-                          variant="h6"
-                          component="h2"
-                        >
-                          Exclusão de usuário
-                        </Typography>
-
-                        <Typography
-                          id="modal-modal-description"
-                          sx={{ mt: 2, textJustify: "justified" }}
-                        >
-                          Tem certeza de que deseja excluir esse usuário?
-                        </Typography>
-
-                        <Stack direction="row" spacing={5} sx={{ mt: 3 }}>
-                          <Button
-                            variant="contained"
-                            onClick={handleDelete}
-                            disabled={loading}
-                          >
-                            Sim
-                          </Button>
-
-                          <Button
-                            variant="contained"
-                            color="error"
-                            onClick={handleClose}
-                          >
-                            Não
-                          </Button>
-                        </Stack>
-                      </Box>
-                    </Modal>
+                      handleClose={handleClose}
+                      handleDelete={handleDelete}
+                      loading={loading}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
